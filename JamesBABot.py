@@ -6,6 +6,7 @@ from langchain.tools import StructuredTool
 from dotenv import load_dotenv
 import os
 from docx import Document  # Import for creating Word documents
+from docx.shared import RGBColor
 
 # Load environment variables from .env file
 load_dotenv()
@@ -173,6 +174,71 @@ def create_word_document(summary, filename="Project_Summary.docx"):
     doc.save(filename)
     
     print(f"\nWord document '{filename}' has been generated successfully!")
+
+from docx import Document
+from docx.shared import RGBColor
+
+# Function to generate the project management summary document in the format similar to the uploaded image
+def create_project_management_summary(summary, filename="Project_Management_Summary.docx"):
+    # Create a new Document object
+    doc = Document()
+    
+    # Add a title with a logo-like green style
+    doc.add_heading('Techno-PM', 0).alignment = 1  # Center-aligned for a professional look
+    run = doc.paragraphs[0].runs[0]
+    run.font.size = 240000  # Adjust the font size to make it prominent
+    
+    # Add "Project Management Templates" in a smaller font and green
+    doc.add_paragraph('Project Management Templates', style='Normal').runs[0].font.color.rgb = RGBColor(0, 128, 0)
+    
+    # Add Key Highlights Section
+    doc.add_heading('Key Highlights', level=1)
+    doc.add_paragraph('Overall the project is 25% complete.')
+    doc.add_paragraph('Requirements have been delayed due to customer changes.').runs[0].bold = True
+    doc.add_paragraph('Project Build is at 75%.')
+    doc.add_paragraph("John on leave next week and Friday is a public holiday.")
+    
+    # Add Task/Issue Description Table
+    doc.add_heading('Task / Issue Description', level=1)
+
+    # Create table headers and fill in data based on user story inputs
+    table = doc.add_table(rows=1, cols=6)
+    hdr_cells = table.rows[0].cells
+    hdr_cells[0].text = 'No.'
+    hdr_cells[1].text = 'Task / Issue Description'
+    hdr_cells[2].text = 'Owner'
+    hdr_cells[3].text = 'Start'
+    hdr_cells[4].text = 'Due'
+    hdr_cells[5].text = 'Status'
+    
+    # Adding example data based on prior information; tasks, owners, start and due dates
+    tasks_data = [
+        [1, "Complete the Business Requirements and handover to John", "Julie", "12-Jan", "19-Mar", "WIP"],
+        [2, "Organize meeting with customer to understand changes to our policies", "Sam", "13-Jan", "14-Jan", "WIP"],
+        [3, "Organize system testing for the change required", "John", "11-Jan", "12-Jan", "Late"],
+        [4, "Discuss the possible changes to the scope", "Kylie", "11-Feb", "14-Feb", "Close"]
+    ]
+    
+    # Filling the table with tasks
+    for task in tasks_data:
+        row_cells = table.add_row().cells
+        for i, task_item in enumerate(task):
+            row_cells[i].text = str(task_item)
+    
+    # Add Comments/Updates section for each task
+    doc.add_heading('Comments / Updates', level=2)
+    doc.add_paragraph("15-Jan by John: The task is not complete as the business requirements are not clear.")
+    doc.add_paragraph("18-Feb by John: The task is back on track after requirements have been received.")
+    doc.add_paragraph("11-Jan by Sam: This meeting will need to be moved as the changes are not finalised.")
+    doc.add_paragraph("13-Jan by John: Task Delayed as no capacity present.")
+    doc.add_paragraph("12-Jan by Kylie: Task complete.")
+    
+    # Save the document
+    doc.save(filename)
+    return filename
+
+# Generate the project management summary document
+filename = create_project_management_summary(summary="Project Summary", filename="Project_Management_Summary.docx")
 
 # Create and initialize agent with tools
 tools = [
