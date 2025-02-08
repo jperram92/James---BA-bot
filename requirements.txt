@@ -3,3 +3,6 @@ streamlit
 requests
 os
 time
+langchain_openai
+langchain
+python-docx
